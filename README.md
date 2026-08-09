@@ -1,246 +1,163 @@
-# 🚀 Job Board API
+# Job Board API
 
-![Python 3.12+ e FastAPI (async](https://img.shields.io/badge/-Python 3.12+ e FastAPI (async-blue?style=flat-square) ![alta performance)
+API REST para gerenciamento de vagas de emprego e empresas, construída com FastAPI, SQLAlchemy 2.0 e Pydantic v2.
 
-•
-Pydantic para validação de dados e schemas (EmpresaCreate](https://img.shields.io/badge/-alta performance)
+**🔗 API ao vivo:** https://job-board-api-4pdc.onrender.com
+**📖 Documentação interativa (Swagger):** https://job-board-api-4pdc.onrender.com/docs
 
-•
-Pydantic para validação de dados e schemas (EmpresaCreate-blue?style=flat-square) ![VagaCreate](https://img.shields.io/badge/-VagaCreate-blue?style=flat-square) ![ValidadorCsv)
+> Nota: o plano gratuito do Render "dorme" a API após um período de inatividade. Se o primeiro acesso demorar ~30-50s pra responder, é isso — é só esperar o servidor acordar.
 
-•
-SQLite como banco de dados (persistência local](https://img.shields.io/badge/-ValidadorCsv)
+---
 
-•
-SQLite como banco de dados (persistência local-blue?style=flat-square) ![sem configuração)
+## O problema que este projeto resolve
 
-•
-pytest para testes automatizados
+Empresas de RH e recrutadores costumam receber vagas em planilhas soltas, sem um lugar central pra consultar. Esta API oferece um cadastro estruturado de empresas e vagas, com **importação em lote via CSV** — o fluxo real que muitas empresas usam pra carregar dados históricos — processada em segundo plano pra não travar a requisição em arquivos grandes.
 
-•
-Documentação interativa automática (OpenAPI 3.4 / Swagger UI)](https://img.shields.io/badge/-sem configuração)
+---
 
-•
-pytest para testes automatizados
+## Funcionalidades
 
-•
-Documentação interativa automática (OpenAPI 3.4 / Swagger UI)-blue?style=flat-square) 
+| Recurso | Método | Endpoint | Descrição |
+|---|---|---|---|
+| Empresas | `POST` | `/empresas/` | Cadastra uma nova empresa |
+| Empresas | `GET` | `/empresas/` | Lista empresas (com paginação `skip`/`limit`) |
+| Empresas | `GET` | `/empresas/{empresa_id}` | Consulta uma empresa pelo ID |
+| Vagas | `POST` | `/vagas/` | Cadastra uma nova vaga |
+| Vagas | `GET` | `/vagas/` | Lista vagas (filtro opcional `?senioridade=`) |
+| Vagas | `GET` | `/vagas/{vaga_id}` | Consulta uma vaga pelo ID |
+| Importação | `POST` | `/vagas/importar-csv/` | Importa vagas em lote via CSV (processamento em background) |
+| Importação | `GET` | `/vagas/importar-csv/{importacao_id}` | Consulta o status/resultado de uma importação |
 
-## 📝 Descrição
-API REST para gerenciamento de vagas de emprego e empresas, construída com FastAPI. Permite cadastrar empresas, publicar vagas, importar grandes volumes de vagas por CSV e reimportar dados com validação completa.
-O problema que este projeto resolve
+---
 
-Recrutadores e empresas de RH frequentemente recebem dezenas de vagas por e-mail ou planilha, espalhadas em arquivos CSV, sem um lugar central para consultá-las. Esta API resolve isso oferecendo um cadastro estruturado de empresas e vagas, com importação em lote via CSV — o fluxo real que empresas usam para carregar dados históricos.
+## Tecnologias
 
-Funcionalidades
+- **Python 3.12** + **FastAPI** (async, validação automática via Pydantic, docs OpenAPI geradas sozinhas)
+- **SQLAlchemy 2.0** como ORM
+- **Pydantic v2** para schemas de entrada/saída (`EmpresaCreate`/`EmpresaResponse`, `VagaCreate`/`VagaResponse`)
+- **PostgreSQL** em produção, **SQLite** automático em desenvolvimento local (sem precisar configurar nada)
+- **Docker + docker-compose** para rodar API e banco juntos localmente, espelhando produção
+- **pytest** — 16 testes automatizados cobrindo rotas de sucesso, erros (404/422) e o fluxo de importação CSV
+- Deploy contínuo no **Render**
 
-Recurso
-Endpoint
-Descrição
-Empresas
-POST /empresas/
-Cadastra uma nova empresa
-Empresas
-GET /empresas/
-Lista todas as empresas
-Empresas
-GET /empresas/{empresa_id}
-Consulta uma empresa pelo ID
-Vagas
-POST /vagas/
-Cadastra uma nova vaga
-Vagas
-GET /vagas/
-Lista todas as vagas (com filtros )
-Vagas
-GET /vagas/{vaga_id}
-Consulta uma vaga pelo ID
-Importação
-POST /vagas/importar-csv/
-Importa vagas em lote a partir de um arquivo CSV
-Reimportação
-POST /vagas/importar-csv/reimportar-id
-Reimporta/ajusta uma importação anterior
+---
 
+## Como rodar localmente
 
+### Opção 1 — com Docker (recomendado, já sobe com Postgres)
 
+```bash
+git clone https://github.com/Guilhermewew/job_board_api.git
+cd job_board_api
+docker compose up
+```
 
-Tecnologias
+Acesse: http://localhost:8000/docs
 
-•
-Python 3.12+ e FastAPI (async, alta performance)
+### Opção 2 — direto com Python (usa SQLite, sem dependências externas)
 
-•
-Pydantic para validação de dados e schemas (EmpresaCreate, VagaCreate, ValidadorCsv)
+```bash
+git clone https://github.com/Guilhermewew/job_board_api.git
+cd job_board_api
 
-•
-SQLite como banco de dados (persistência local, sem configuração)
-
-•
-pytest para testes automatizados
-
-•
-Documentação interativa automática (OpenAPI 3.4 / Swagger UI)
-
-Como rodar localmente
-
-Bash
-
-
-# 1. Clone o repositório
-git clone https://github.com/SEU-USUARIO/job-board-api.git
-cd job-board-api
-
-# 2. Crie o ambiente virtual
 python -m venv .venv
-source .venv/bin/activate   # Linux/Mac
-.venv\Scripts\activate      # Windows
+source .venv/bin/activate      # Linux/Mac
+.venv\Scripts\activate         # Windows
 
-# 3. Instale as dependências
 pip install -r requirements.txt
 
-# 4. Inicie o servidor
-fastapi dev app/main.py
+uvicorn app.main:app --reload
+```
 
-# 5. Acesse a documentação interativa
-# http://127.0.0.1:8000/docs
+Acesse: http://127.0.0.1:8000/docs
 
+---
 
+## Como rodar os testes
 
-Como testar
+```bash
+pytest tests/ -v
+```
 
-Bash
+16 testes, cobrindo: criação e listagem de empresas/vagas, validação de campos (422), busca de recurso inexistente (404), filtro de vagas por senioridade, e importação de CSV — incluindo um teste que reproduz um bug real encontrado durante o desenvolvimento (veja abaixo).
 
+---
 
-# Executar toda a suíte de testes
-pytest
+## Exemplos de uso
 
-# Com cobertura
-pytest --cov=app
+**Cadastrar uma empresa:**
 
-
-
-Exemplos de uso
-
-Cadastrar uma empresa:
-
-Bash
-
-
-curl -X POST http://127.0.0.1:8000/empresas/ \
+```bash
+curl -X POST https://job-board-api-4pdc.onrender.com/empresas/ \
   -H "Content-Type: application/json" \
-  -d '{
-    "nome": "TechCorp Brasil",
-    "setor": "Tecnologia",
-    "cidade": "São Paulo"
-  }'
+  -d '{"nome": "TechCorp Brasil", "setor": "Tecnologia"}'
+```
 
+**Cadastrar uma vaga:**
 
+```bash
+curl -X POST https://job-board-api-4pdc.onrender.com/vagas/ \
+  -H "Content-Type: application/json" \
+  -d '{"titulo": "Desenvolvedor Backend Jr", "descricao": "Vaga para atuar com FastAPI", "senioridade": "Junior", "empresa_id": 1}'
+```
 
-Importar vagas por CSV:
+**Importar vagas por CSV:**
 
-Bash
+```bash
+curl -X POST https://job-board-api-4pdc.onrender.com/vagas/importar-csv/ \
+  -F "arquivo=@vagas_exemplo.csv"
+```
 
+Formato esperado do CSV (colunas obrigatórias):
 
-curl -X POST http://127.0.0.1:8000/vagas/importar-csv/ \
-  -F "file=@vagas_exemplo.csv"
+```
+titulo,descricao,senioridade,empresa_id
+Desenvolvedor Python Backend,Vaga remota para atuar com FastAPI,Pleno,1
+Analista de Dados Pleno,Atuação com Python e SQL,Pleno,1
+```
 
+A resposta do import devolve um `id` de acompanhamento:
 
+```json
+{
+  "id": 3,
+  "arquivo": "vagas_exemplo.csv",
+  "status": "processando",
+  "total_linhas": 0,
+  "linhas_sucesso": 0,
+  "linhas_falha": 0,
+  "erros": null
+}
+```
 
-Formato esperado do CSV:
-
-Plain Text
-
-
-titulo,cargo,empresa_id,salario,modalidade
-Desenvolvedor Python Backend,Desenvolvedor,1,8000,remoto
-Analista de Dados Pleno,Analista,1,6000,hibrido
-
-
-
-Linhas inválidas são rejeitadas com mensagem clara de erro, sem interromper o restante da importação.
-
-Arquitetura e decisões técnicas
-
-•
-FastAPI em vez de Flask/Django: escolhi FastAPI pela validação automática via Pydantic, suporte nativo a async (importante para importações em lote ) e documentação OpenAPI gerada automaticamente — o que reduz trabalho manual e aumenta a confiabilidade dos contratos de API.
-
-•
-Schemas separados de entrada e saída (Create vs Response): evita vazar campos internos e permite evoluir o contrato de cada endpoint independentemente.
-
-•
-Validação de CSV em duas etapas (ValidadorCsv + ImportacaoCSVVagas): a validação acontece antes de qualquer escrita no banco, garantindo que importações parciais nunca deixem o sistema em estado inconsistente.
-
-•
-SQLite para a primeira versão: mantém o projeto rodando sem dependências externas (Docker, PostgreSQL), priorizando simplicidade e reprodutibilidade. Uma migração para PostgreSQL é o próximo passo natural para produção.
-
-Próximos passos
-
-
-
-
-Autenticação com JWT (empresas gerenciam apenas as próprias vagas)
-
-
-
-
-Migração para PostgreSQL
-
-
-
-
-Importação em background (BackgroundTasks/Celery) para arquivos grandes
-
-
-
-
-Frontend simples com Streamlit consumindo a API
-
-Sobre o autor
-
-Desenvolvedor Python em formação, focado em backend e dados. Este projeto faz parte de um portfólio construído para demonstrar domínio de REST, validação, testes e deploy.
-
-
-
-
-Feito com FastAPI e muito café.
+Consulte o resultado com `GET /vagas/importar-csv/{id}` depois de alguns segundos — o status muda para `concluido`, com a contagem de linhas processadas com sucesso e falha, e o detalhe dos erros por linha.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
-- **Python 3.12+ e FastAPI (async**
-- **alta performance)
+## Arquitetura e decisões técnicas
 
-•
-Pydantic para validação de dados e schemas (EmpresaCreate**
-- **VagaCreate**
-- **ValidadorCsv)
+- **FastAPI em vez de Flask/Django:** validação automática via Pydantic, suporte nativo a `async`/`BackgroundTasks` (importante pra importação de arquivos grandes sem travar a requisição) e documentação OpenAPI gerada automaticamente.
+- **Schemas separados de entrada e saída** (`*Create` vs `*Response`): evita vazar detalhes internos do banco e permite evoluir o contrato de cada endpoint de forma independente.
+- **`DATABASE_URL` via variável de ambiente:** o mesmo código roda com SQLite localmente (zero configuração) e com PostgreSQL em produção, sem precisar trocar uma linha — só define a env var.
+- **Importação de CSV em background com rastreamento de status:** cada import cria um registro (`ImportacaoCSV`) que pode ser consultado depois, com contagem de sucesso/falha por linha.
 
-•
-SQLite como banco de dados (persistência local**
-- **sem configuração)
+### Bug real encontrado e corrigido
 
-•
-pytest para testes automatizados
+Na primeira versão, o processamento do CSV adicionava cada linha ao banco dentro de um loop, mas só chamava `commit()` **depois** do loop terminar. Isso significava que se **uma única linha** do arquivo tivesse um erro (ex: `empresa_id` inválido), a exceção interrompia o loop antes de chegar no `commit()` — e **nenhuma linha era salva**, nem as que estavam corretas, sem nenhum aviso ao usuário.
 
-•
-Documentação interativa automática (OpenAPI 3.4 / Swagger UI)**
+A correção trata cada linha individualmente: linhas inválidas são registradas com o motivo do erro e puladas, enquanto as válidas são commitadas normalmente. Esse comportamento está coberto por um teste específico (`test_importar_csv_com_linha_invalida_nao_derruba_as_validas`) que reproduz o cenário do bug original.
 
 ---
 
-## 💻 Como Executar o Projeto
+## Próximos passos
 
-1. **Clone o repositório:**
-   ```bash
-   git clone [https://github.com/](https://github.com/)Guilhemewew/Job Board API.git
-   ```
-
-2. **Entre no diretório:**
-   ```bash
-   cd Job Board API
-   ```
+- [ ] Autenticação com JWT ou API key
+- [ ] Rotas de atualização (`PUT`/`PATCH`) e remoção (`DELETE`) de empresas e vagas
+- [ ] Frontend simples (Streamlit ou HTML) consumindo a API
+- [ ] Paginação também na listagem de vagas
 
 ---
 
-## 👤 Autor
-Desenvolvido por [Guilhemewew](https://github.com/Guilhemewew).
+## Autor
+
+Desenvolvido por [Guilhermewew](https://github.com/Guilhermewew) — estudante de Análise e Desenvolvimento de Sistemas, com foco em backend Python.
